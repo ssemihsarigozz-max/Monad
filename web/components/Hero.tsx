@@ -19,6 +19,7 @@ export default function Hero() {
         </div>
       </div>
       <div className="campus-print" aria-hidden="true">
+        <div className="time-sticker"><strong>+30′</strong><span>STAY A LITTLE</span><span>LONGER ↗</span></div>
         <div className="print-top"><span>FIG. 01 — THE EXTRA HALF HOUR</span><span>↗</span></div>
         <svg viewBox="0 0 500 380" fill="none" className="campus-drawing">
           <defs><pattern id="lines" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 6L6 0" stroke="currentColor" strokeWidth=".5"/></pattern></defs>
@@ -41,6 +42,11 @@ export default function Hero() {
           <text x="30" y="340" fill="var(--ink)" fontSize="9" fontFamily="monospace" transform="rotate(-30 30 340)">OPEN BY COLLECTIVE DEMAND</text>
         </svg>
         <div className="print-bottom"><span>01 COMMIT → 02 UNLOCK → 03 GIVE</span><span>© CtC</span></div>
+      </div>
+      <div className="campus-ticker" aria-label="Your campus. Your call. Make more time. Do more good.">
+        <div className="ticker-track" aria-hidden="true">
+          {[0, 1, 2, 3].map(i => <span key={i}>YOUR CAMPUS. YOUR CALL. <b>↗</b> MAKE MORE TIME. <b>✳</b> DO MORE GOOD. <b>↗</b> CONSENSUS THEN CHARITY. <b>✳</b></span>)}
+        </div>
       </div>
       <div className="metrics">
         <div><small>THE CONSENSUS</small><strong>02 <span>people</span></strong></div>
