@@ -1,6 +1,6 @@
 "use client";
 
-import { BrowserProvider, Contract, formatEther, parseEther } from "ethers";
+import { BrowserProvider, Contract, JsonRpcProvider, formatEther, parseEther } from "ethers";
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { COMMON_GROUND_ABI, COMMON_GROUND_ADDRESS, MONAD_CHAIN_ID, MONAD_CHAIN_HEX } from "@/lib/contract";
 
@@ -18,23 +18,36 @@ const stageFor = (status: bigint): Stage => ["locked", "active", "successful", "
 const Context = createContext<null | { state: State; now: number; busy: boolean; toast: string | null; notify: (message: string) => void; connect: () => Promise<void>; select: (service: number) => void; support: (id: string) => Promise<void>; refund: (id: string) => Promise<void>; finalize: (serviceId: number) => Promise<void>; refresh: () => Promise<void> }>(null);
 
 function provider() { if (!window.ethereum) throw new Error("MetaMask bulunamadı. Tarayıcı eklentisini açıp tekrar deneyin."); return new BrowserProvider(window.ethereum); }
-function contract(runner: BrowserProvider | Awaited<ReturnType<BrowserProvider["getSigner"]>>) { return new Contract(COMMON_GROUND_ADDRESS, COMMON_GROUND_ABI, runner); }
+const MONAD_RPC_URL = process.env.NEXT_PUBLIC_MONAD_RPC_URL || "https://testnet-rpc.monad.xyz";
+let publicProvider: JsonRpcProvider | null = null;
+function readProvider() { if (!publicProvider) publicProvider = new JsonRpcProvider(MONAD_RPC_URL, MONAD_CHAIN_ID, { staticNetwork: true }); return publicProvider; }
+function contract(runner: BrowserProvider | JsonRpcProvider | Awaited<ReturnType<BrowserProvider["getSigner"]>>) { return new Contract(COMMON_GROUND_ADDRESS, COMMON_GROUND_ABI, runner); }
 function readableError(error: unknown) { const candidate = error as { shortMessage?: string; info?: { error?: { message?: string } }; message?: string }; return candidate.shortMessage || candidate.info?.error?.message || candidate.message || "İşlem tamamlanamadı."; }
 
 export function AppProvider({ children }: { children: ReactNode }) {
  const [state, setState] = useState<State>(fresh); const [now, setNow] = useState(Date.now()); const [toast, setToast] = useState<string | null>(null); const [busy, setBusy] = useState(false); const ref = useRef(state); ref.current = state;
  const notify = (message: string) => setToast(message); const commit = (next: State) => { ref.current = next; setState(next); };
  const refresh = async () => {
-  if (!window.ethereum) return;
-  const accounts = await window.ethereum.request({ method: "eth_accounts" }) as string[]; const chain = await window.ethereum.request({ method: "eth_chainId" });
-  if (!accounts[0] || chain !== MONAD_CHAIN_HEX) { commit({ ...ref.current, connected: false, address: "", balance: 0, actualBalance: null }); return; }
-  const browserProvider = provider(); const live = contract(browserProvider);
-  const [balance, accrued, serviceData] = await Promise.all([browserProvider.getBalance(accounts[0]), live.impactAccrued(), Promise.all(services.map((_, serviceId) => live.getService(serviceId)))]);
-  const slots = await Promise.all(serviceData.map(async (service, serviceId) => Promise.all([0, 1, 2].map(async (slotIndex) => {
-   const [slot, supported] = await Promise.all([live.getSlot(serviceId, slotIndex), live.hasSupported(serviceId, slotIndex, accounts[0])]);
-   return { id: `${serviceId}-${slotIndex}`, number: slotIndex + 1, count: Number(slot[1]), stage: stageFor(slot[0]), deadline: Number(service[0]) * 1000, claimed: false, pledge: supported ? 1 : 0 };
-  }))));
-  commit({ ...ref.current, connected: true, address: accounts[0], balance: Number(formatEther(balance)), actualBalance: Number(formatEther(balance)), network: "Monad Testnet", treasury: Number(formatEther(accrued)), slots });
+  // Slot and treasury data are read from the public Monad RPC, so visitors see live state even without a wallet.
+  let account = ""; let onMonad = false;
+  if (window.ethereum) { try { const accounts = await window.ethereum.request({ method: "eth_accounts" }) as string[]; const chain = await window.ethereum.request({ method: "eth_chainId" }); account = accounts[0] || ""; onMonad = chain === MONAD_CHAIN_HEX; } catch { /* wallet unavailable: fall back to read-only mode */ } }
+  const user = account && onMonad ? account : "";
+  try {
+   const reader = readProvider(); const live = contract(reader);
+   const [balance, accrued, serviceData] = await Promise.all([user ? reader.getBalance(user) : Promise.resolve(null), live.impactAccrued(), Promise.all(services.map((_, serviceId) => live.getService(serviceId)))]);
+   const slots = await Promise.all(serviceData.map(async (service, serviceId) => Promise.all([0, 1, 2].map(async (slotIndex) => {
+    const [slot, supported] = await Promise.all([live.getSlot(serviceId, slotIndex), user ? live.hasSupported(serviceId, slotIndex, user) : Promise.resolve(false)]);
+    const stage = stageFor(slot[0]); let claimed = false;
+    // The contract has no refunded() view. For a failed slot this wallet supported, a simulated claim only reverts once the refund was already taken.
+    if (stage === "failed" && supported) { try { await live.claimRefund.staticCall(serviceId, slotIndex, { from: user }); } catch { claimed = true; } }
+    return { id: `${serviceId}-${slotIndex}`, number: slotIndex + 1, count: Number(slot[1]), stage, deadline: Number(service[0]) * 1000, claimed, pledge: supported ? 1 : 0 };
+   }))));
+   const mon = balance === null ? 0 : Number(formatEther(balance));
+   commit({ ...ref.current, connected: Boolean(user), address: user, balance: mon, actualBalance: balance === null ? null : mon, network: "Monad Testnet", treasury: Number(formatEther(accrued)), slots });
+  } catch {
+   commit({ ...ref.current, connected: Boolean(user), address: user });
+   notify("Monad Testnet verileri okunamadı. Bağlantıyı kontrol edip sayfayı yenileyin.");
+  }
  };
  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
  useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(null), 5000); return () => clearTimeout(timer); }, [toast]);
