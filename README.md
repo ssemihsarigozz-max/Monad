@@ -12,5 +12,14 @@ This is a hackathon demo. Library, Laundry Room, and Cafeteria schedules are fic
 
 ## Delivery status
 
-Shared contract specification is ready. No application, deployment, contract address, ABI, wallet connection, or transaction has been created yet.
+Shared contract specification and compiled ABI are ready. The frontend still awaits wallet and contract integration.
+
+## Monad Testnet deployment
+
+- Network: Monad Testnet (`10143`)
+- Contract: `0xB0DbF48D5BA193Fc466bC9bfD30a8AC43e93886D`
+- ABI: `chain/abi/CommonGround.json`
+- Deployment status: contract code confirmed on-chain.
+
+The campaign deadlines use the deployment script's short demo configuration. Do not describe the contract, a treasury transfer, or any testnet transaction as proof of a real-world service extension or donation.
 
