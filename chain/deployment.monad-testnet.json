@@ -1,0 +1,17 @@
+{
+  "network": "Monad Testnet",
+  "chainId": 10143,
+  "rpcUrl": "https://testnet-rpc.monad.xyz",
+  "contractAddress": "0xB0DbF48D5BA193Fc466bC9bfD30a8AC43e93886D",
+  "abiPath": "chain/abi/CommonGround.json",
+  "nativeCurrency": {
+    "name": "MON",
+    "symbol": "MON",
+    "decimals": 18
+  },
+  "demoThreshold": 2,
+  "verified": {
+    "contractCode": true,
+    "checkedAt": "2026-10-24"
+  }
+}
