@@ -1,0 +1,3 @@
+"use client";
+import {BookOpen,WashingMachine, Coffee} from 'lucide-react';import {services,useApp} from '@/context/AppContext';import {motion} from 'framer-motion';
+export default function ServiceTabs(){const {state,select}=useApp();const icons=[BookOpen,WashingMachine,Coffee];return <div className="service-tabs" role="tablist" aria-label="Campus services">{services.map((s,i)=>{const Icon=icons[i];return <button key={s} role="tab" aria-selected={state.active===i} onClick={()=>select(i)} className={state.active===i?'selected':''}>{state.active===i&&<motion.span layoutId="tab" className="tab-bg"/>}<Icon size={18}/><span>{s}</span><small>0{i+1}</small></button>})}</div>}
