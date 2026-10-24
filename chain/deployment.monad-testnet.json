@@ -2,16 +2,34 @@
   "network": "Monad Testnet",
   "chainId": 10143,
   "rpcUrl": "https://testnet-rpc.monad.xyz",
-  "contractAddress": "0xB0DbF48D5BA193Fc466bC9bfD30a8AC43e93886D",
-  "abiPath": "chain/abi/CommonGround.json",
   "nativeCurrency": {
     "name": "MON",
     "symbol": "MON",
     "decimals": 18
   },
-  "demoThreshold": 2,
+  "contractAddress": "0x864890ee1C9A005574808D5D0baF51a06AA0Aa62",
+  "transactionHash": "0x8b9d010a03982d85c63dd1ef64b0212cef71d74dd3fe255c794c42e4b27d54c3",
+  "blockNumber": 73784625,
+  "treasury": "0x413879c81595129ba9CB4FF61d38add21B13353a",
+  "deployedAt": "2026-10-24T10:00:12.000Z",
+  "serviceDeadlines": [
+    "1793008812",
+    "1793008812",
+    "1793008812"
+  ],
+  "serviceDeadlinesUTC": [
+    "2026-10-26T10:00:12.000Z",
+    "2026-10-26T10:00:12.000Z",
+    "2026-10-26T10:00:12.000Z"
+  ],
+  "serviceThresholds": [
+    "2",
+    "2",
+    "2"
+  ],
+  "abiPath": "chain/abi/CommonGround.json",
   "verified": {
     "contractCode": true,
-    "checkedAt": "2026-10-24"
+    "serviceConfiguration": true
   }
 }

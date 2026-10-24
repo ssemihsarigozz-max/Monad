@@ -42,9 +42,12 @@ async function main() {
     }
   }
   const receipt = await contract.deploymentTransaction().wait();
-  const metadata = { network: "Monad Testnet", chainId: 10143, contractAddress,
+  const metadata = { network: "Monad Testnet", chainId: 10143, rpcUrl: "https://testnet-rpc.monad.xyz",
+    nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 }, contractAddress,
     transactionHash: receipt.hash, blockNumber: receipt.blockNumber, treasury,
-    serviceDeadlines: deadlines.map(String), serviceThresholds: thresholds.map(String),
+    deployedAt: new Date(Number(block.timestamp) * 1000).toISOString(),
+    serviceDeadlines: deadlines.map(String), serviceDeadlinesUTC: deadlines.map((value) => new Date(Number(value) * 1000).toISOString()),
+    serviceThresholds: thresholds.map(String),
     abiPath: "chain/abi/CommonGround.json", verified: { contractCode: true, serviceConfiguration: true } };
   fs.writeFileSync(path.join(__dirname, "../deployment.monad-testnet.json"), JSON.stringify(metadata, null, 2) + "\n");
   console.log(`CommonGround deployed and checked at ${contractAddress}`);

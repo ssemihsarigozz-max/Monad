@@ -12,14 +12,18 @@ This is a hackathon demo. Library, Laundry Room, and Cafeteria schedules are fic
 
 ## Delivery status
 
-Shared contract specification and compiled ABI are ready. The frontend still awaits wallet and contract integration.
+The frontend includes Monad Testnet wallet and contract integration.
 
 ## Monad Testnet deployment
 
 - Network: Monad Testnet (`10143`)
-- Contract: `0xB0DbF48D5BA193Fc466bC9bfD30a8AC43e93886D`
+- Contract: `0x864890ee1C9A005574808D5D0baF51a06AA0Aa62`
+- Deployment transaction: `0x8b9d010a03982d85c63dd1ef64b0212cef71d74dd3fe255c794c42e4b27d54c3`
+- Deployment block: `73784625`
+- Campaign deadline: 26 October 2026, 10:00:12 UTC (13:00:12 Türkiye time)
+- Threshold: `2` supporters per slot
 - ABI: `chain/abi/CommonGround.json`
-- Deployment status: contract code confirmed on-chain.
+- Deployment status: contract code and all three service configurations confirmed on-chain.
 
-The campaign deadlines use the deployment script's short demo configuration. Do not describe the contract, a treasury transfer, or any testnet transaction as proof of a real-world service extension or donation.
+The three services each have three sequential slots. Do not describe the contract, a treasury transfer, or any testnet transaction as proof of a real-world service extension or donation.
 
